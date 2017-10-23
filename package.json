@@ -1,0 +1,30 @@
+{
+  "name": "CrimeSpot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aileenfan05/CrimeSpot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aileenfan05/CrimeSpot/issues"
+  },
+  "homepage": "https://github.com/aileenfan05/CrimeSpot#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "fast-csv": "^2.4.1",
+    "mysql": "^2.15.0",
+    "pg": "^7.3.0",
+    "query-string": "^5.0.0",
+    "redis": "^2.8.0",
+    "underscore": "^1.8.3",
+    "uuid": "^3.1.0"
+  }
+}
