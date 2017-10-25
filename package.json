@@ -24,6 +24,7 @@
     "pg": "^7.3.0",
     "query-string": "^5.0.0",
     "redis": "^2.8.0",
+    "request": "^2.83.0",
     "underscore": "^1.8.3",
     "uuid": "^3.1.0"
   }

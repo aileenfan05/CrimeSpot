@@ -26,3 +26,4 @@ csv
      console.log("done");
  });
  
+ //var string = INSERT INTO incident(uuid, category, date, pd_district, resolution) VALUES('112233444455','WARRANTS','2017-04-19','MISSION','ARREST, BOOKED') ON CONFLICT WHERE category='WARRANTS' AND resolution='ARREST, BOOKED' DO NOTHING

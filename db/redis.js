@@ -25,7 +25,8 @@ client.on("error", function (err) {
 //     console.log(reply.toString()); // Will print `OK`
 // });
 var setCrime = function (key, value, callback) {
-	client.set(key, value, function (err, result) {
+	// EXPRIE IN 6 HRS
+	client.set(key, value, 'EX', 21600, function (err, result) {
 		if (err) {
 			console.log('error in caching result', err);
 			return callback(err);
