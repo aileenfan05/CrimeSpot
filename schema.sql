@@ -1,19 +1,7 @@
-DROP DATABASE IF EXISTS test;
-
-CREATE DATABASE test;
-
-USE test;
-
-CREATE TABLE test_table (
-  userID VARCHAR(255),
-  name VARCHAR(255) NOT NULL,
-  age INT,
-  PRIMARY KEY (userID)
+CREATE TABLE incident (
+  uuid VARCHAR(36) PRIMARY KEY,
+  category VARCHAR(255),
+  date date,
+  pd_district VARCHAR(255),
+  resolution VARCHAR(255)
 );
-
-LOAD DATA LOCAL INFILE './db/test.csv' 
-INTO TABLE random 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;

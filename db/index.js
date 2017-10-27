@@ -4,26 +4,26 @@ var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/cr
 var uuidv4 = require('uuid/v4');
 var client = new pg.Client(connectionString);
 client.connect();
-
+//
 var getCrime = function(district, category, granularity, fromDate, toDate, callback) {
 	if (category === 'All') {
-		var params = [granularity, district, fromDate, toDate];
-		var query = "select date_trunc($1, date) as granularity, count(*) from incident \
-							WHERE pd_district = $2 AND date >= to_timestamp($3, 'YYYY-MM-DD') AND date < to_timestamp($4, 'YYYY-MM-DD') \
-							GROUP BY granularity ORDER BY granularity";
+		//var params = [granularity, district, fromDate, toDate];
+		var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
+							WHERE pd_district = '${district}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
+							GROUP BY ${granularity} ORDER BY ${granularity}`;
 	} else {
-		var params = [granularity, district, category, fromDate, toDate];
-		var query = "select date_trunc($1, date) as granularity, count(*) from incident \
-							WHERE pd_district = $2 AND category = $3 AND date >= to_timestamp($4, 'YYYY-MM-DD') AND date < to_timestamp($5, 'YYYY-MM-DD') \
-							GROUP BY granularity ORDER BY granularity";
+		//var params = [granularity, district, category, fromDate, toDate];
+		var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
+							WHERE pd_district = '${district}' AND category = '${category}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
+							GROUP BY ${granularity} ORDER BY ${granularity}`;
 	}
-	client.query(query, params, (err, result) => {
+	client.query(query, (err, result) => {
 		//console.log(err)
 		if (err) {
-			//console.log('error getting crime data', err);
+			console.log('error getting crime data', err);
 			return callback(err, null);
 		} 
-		//console.log(result.rows);
+		console.log(result.rows);
 		return callback(null,result.rows)
 	});
 }
