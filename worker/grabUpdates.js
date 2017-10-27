@@ -4,7 +4,7 @@ var db = require('../db/index.js');
 let getCrimeUpdate = function (cb) {
 
 	let options = {
-    url: `https://data.sfgov.org/resource/cuks-n6tp.json?$order=date DESC&$limit=10`,
+    url: `https://data.sfgov.org/resource/cuks-n6tp.json?$where=date > '2017-10-01'`,
     headers: {
       'User-Agent': 'request',
       'app_tocket': 'S5H1R2bs9xHbbNHRkWPGaYlzC'
@@ -22,16 +22,17 @@ let getCrimeUpdate = function (cb) {
   request(options, callback);
 };
 
+// getCrimeUpdate(function(err, result) {
+// 	if (err) {
+// 		return console.log('error in worker');
+// 	}
+// 	console.log(result);
+// });
 getCrimeUpdate(function(err, result) {
 	if (err) {
 		return console.log('error in worker');
 	}
-	// db.insertCrime(result, function (err, res) {
-	// 	if (err) {
-	// 		return;
-	// 	} 
-	// 	console.log(res);
-	// });
+	
 	result.map(item => {
 		//console.log('hi', item);
 		//db.insertCrime(item);

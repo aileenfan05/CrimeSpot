@@ -72,6 +72,24 @@ var insertCrime = function (item, callback) {
 	//console.log(category, date, district,resolution);
 }
 
+var getMaxDate = function (callback) {
+	client.query('select max(date) from incident', (err, result) => {
+		if (err) {
+			//console.log('error getting crime data', err);
+			return callback(err, null);
+		} 
+		//console.log(result.rows);
+		return callback(null,result.rows)
+	});
+}
+
+getMaxDate(function(err, result) {
+	if (err) {
+		return console.log('err', err);
+	}
+	console.log(result);
+});
+
 // var item = {
 // 	address: '0 Block of NAPOLEON ST',
 //   category: 'ASSAULT',
@@ -118,7 +136,8 @@ module.exports = {
 	client,
 	getCrime,
 	getCache,
-	insertCrime
+	insertCrime,
+	getMaxDate
 }
 
 //var query = "select date_trunc('week', date) as week, count(*) from incident where pd_district = 'MISSION' And date > CURRENT_DATE - INTERVAL '3 months' GROUP BY week ORDER BY week";

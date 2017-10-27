@@ -60,6 +60,5 @@ typings/
 dump.rdb
 
 db/Police_Department_Incidents.csv
-db/Police_Incidents2017.csv
 config.js
 
