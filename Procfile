@@ -1,1 +1,1 @@
-web: node server/index.jscd cd
+web: node server/index.js
