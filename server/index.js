@@ -6,7 +6,12 @@ const querystring = require('querystring');
 var db = require('../db/index.js');
 //const worker = require('../worker/grabUpdates'); 
 var redis = require('../db/redis.js');
-
+var statsD = require('node-statsd');
+const statsDClient = new statsD({
+  host: 'statsd.hostedgraphite.com',
+  port: 8125,
+  prefix: process.env.HOSTEDGRAPHITE_APIKEY
+});
 
 app.use(bodyParser.json());
 
@@ -25,39 +30,7 @@ app.get('/crime/:str', function (req, res) {
 	var fromDate = q.from;
 	var toDate = q.to;
 	console.log('after parse', fromDate, toDate);
-	// redis.getCrime(string, function(err, result) {
-	// 	if (err) {
-	// 		return res.send(err)
-	// 	}
-
-	// 	if (result.length > 0) {
-	// 		//monitor cache hit
-	// 		console.log('cache hit');
-	// 		return res.send(JSON.stringify(result));
-	// 	}
-
-	// 	// TODO: Monitoring cache miss
-	// 	console.log('cache miss');
-	// 	db.getCrime(district, category, granularity, fromDate, toDate, function (err, result) {
-	// 		if (err) {
-	// 			// TODO: Monitoring DB error
-	// 			return res.send(err);
-	// 		}
-
-	// 		res.end(JSON.stringify(result));
-
-	// 		// Background cache set
-	// 		redis.setCrime(string, JSON.stringify(result), function (err, result) {
-	// 			if (err) {
-	// 				// TODO: Add monitoring for cache.set error
-	// 				console.log(err);
-	// 				return;
-	// 			}
-
-	// 			// TODO: add monitoring for cache.set success
-	// 		});
-	// 	});
-	// });
+	
 	db.getCrime(district, category, granularity, fromDate, toDate, function (err, result) {
 		if (err) {
 			return res.send(err);
@@ -70,6 +43,7 @@ app.get('/crime/:str', function (req, res) {
 
 app.get('/crime/default/:str', function(req, res) {
 	//get default
+	var start = new Date.now();
 	var string = req.params.str;
 	var q = querystring.parse(string); 
 	var district = q.district;
@@ -83,6 +57,9 @@ app.get('/crime/default/:str', function(req, res) {
 		if (result.length > 0) {
 			//monitor cache hit
 			console.log('cache hit');
+			const latency = Date.now() - start;
+			statsDClient.histogram('.service.crime.query.latency_ms', latency);
+    		statsDClient.increment('.service.crime.query.cache');
 			return res.send(JSON.stringify(result));
 		}
 

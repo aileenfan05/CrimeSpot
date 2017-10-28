@@ -58,7 +58,12 @@ typings/
 .env
 
 dump.rdb
-
+db/Police_Department_Incidents_v1.csv
 db/Police_Department_Incidents.csv
+db/Police_Incidents2017.csv
+db/Police_Incidents2017_v1.csv
+db/transformed.csv
+db/transformed_v1.csv
+db/head.csv
 config.js
 

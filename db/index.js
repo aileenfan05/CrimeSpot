@@ -5,6 +5,9 @@ var uuidv4 = require('uuid/v4');
 var client = new pg.Client(connectionString);
 client.connect();
 //
+
+
+
 var getCrime = function(district, category, granularity, fromDate, toDate, callback) {
 	if (category === 'All') {
 		//var params = [granularity, district, fromDate, toDate];
