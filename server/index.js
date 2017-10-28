@@ -34,10 +34,11 @@ app.get('/crime/:str', function (req, res) {
 	
 	db.getCrime(district, category, granularity, fromDate, toDate, function (err, result) {
 		if (err) {
+			console.log('error getting crime data in server');
 			return res.send(err);
 		}
-		//console.log(result);
-		res.end(JSON.stringify(result));
+		console.log('successfully getting crime data in server');
+		return res.send(JSON.stringify(result));
 	});
 	//res.send('hi');
 })
