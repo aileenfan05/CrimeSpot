@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/aileenfan05/CrimeSpot#readme",
   "dependencies": {
+    "ajax-request": "^1.2.3",
     "express": "^4.16.2",
     "fast-csv": "^2.4.1",
     "mysql": "^2.15.0",

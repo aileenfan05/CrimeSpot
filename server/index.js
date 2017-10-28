@@ -6,6 +6,7 @@ const querystring = require('querystring');
 var db = require('../db/index.js');
 //const worker = require('../worker/grabUpdates'); 
 var redis = require('../db/redis.js');
+//var loadTester = require('./loadTester.js');
 var statsD = require('node-statsd');
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
@@ -43,7 +44,10 @@ app.get('/crime/:str', function (req, res) {
 
 app.get('/crime/default/:str', function(req, res) {
 	//get default
-	var start = new Date.now();
+	//graphite set up
+	var start = Date.now();
+	statsDClient.increment('.service.crime.query.all');
+
 	var string = req.params.str;
 	var q = querystring.parse(string); 
 	var district = q.district;
@@ -60,17 +64,21 @@ app.get('/crime/default/:str', function(req, res) {
 			const latency = Date.now() - start;
 			statsDClient.histogram('.service.crime.query.latency_ms', latency);
     		statsDClient.increment('.service.crime.query.cache');
+    		console.log(latency);
 			return res.send(JSON.stringify(result));
 		}
 
 		// TODO: Monitoring cache miss
 		console.log('cache miss');
 		db.getCache(district, function(err, result) {
+
 			if (err) {
 				// TODO: Monitoring DB error
 				return res.send(err);
 			}
-
+			const latency = Date.now() - start;
+			statsDClient.histogram('.service.crime.query.latency_ms', latency);
+			statsDClient.increment('.service.crime.query.db');
 			res.end(JSON.stringify(result));
 
 			// Background cache set
