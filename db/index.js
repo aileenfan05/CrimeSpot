@@ -22,6 +22,8 @@ var getCrime = function(district, category, granularity, fromDate, toDate, callb
 							WHERE pd_district = '${district}' AND category = '${category}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
 							GROUP BY ${granularity} ORDER BY ${granularity}`;
 	}
+
+	console.log("getCrime Query", query);
 	client.query(query, (err, result) => {
 		console.log("in getCrime query")
 		if (err) {
