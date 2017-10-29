@@ -7,4 +7,4 @@ setInterval(() => {
 		}
 		return console.log(body);
 	})
-}, 3000);
+}, 10);

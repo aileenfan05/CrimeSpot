@@ -63,7 +63,7 @@ app.get('/crime/default/:str', function(req, res) {
 			//monitor cache hit
 			console.log('cache hit');
 			const latency = Date.now() - start;
-			statsDClient.histogram('.service.crime.query.latency_ms', latency);
+			statsDClient.timing('.service.crime.query.latency_ms', latency);
     		statsDClient.increment('.service.crime.query.cache');
     		console.log(latency);
 			return res.send(JSON.stringify(result));
@@ -78,7 +78,7 @@ app.get('/crime/default/:str', function(req, res) {
 				return res.send(err);
 			}
 			const latency = Date.now() - start;
-			statsDClient.histogram('.service.crime.query.latency_ms', latency);
+			statsDClient.timing('.service.crime.query.latency_ms', latency);
 			statsDClient.increment('.service.crime.query.db');
 			res.end(JSON.stringify(result));
 
