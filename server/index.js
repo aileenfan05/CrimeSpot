@@ -21,7 +21,8 @@ app.get('/crime/:str', function (req, res) {
 	var string = req.params.str;
 	//console.log(req.params);
 	var q = querystring.parse(string); 
-
+	var start = Date.now()
+	statsDClient.increment('.service.crime.query.custom');
 	console.log(q, req.params);
 
 	//default values mean that str only contain district info? 
@@ -35,9 +36,12 @@ app.get('/crime/:str', function (req, res) {
 	db.getCrime(district, category, granularity, fromDate, toDate, function (err, result) {
 		if (err) {
 			console.log('error getting crime data in server');
+
 			return res.send(err);
 		}
 		console.log('successfully getting crime data in server');
+		const latency = Date.now() - start;
+		statsDClient.timing('.service.crime.query.custom.latency_ms', latency);
 		return res.send(JSON.stringify(result));
 	});
 	//res.send('hi');
