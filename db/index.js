@@ -1,6 +1,8 @@
 var pg = require('pg');
 // Sets SSL to on for heroku postgres
-pg.defaults.ssl = true;
+if (process.env.DATABASE_URL) {
+	pg.defaults.ssl = true;	
+}
 //const worker = require('../worker/grabUpdates'); 
 var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/crimedb';
 var uuidv4 = require('uuid/v4');
