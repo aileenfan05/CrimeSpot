@@ -10,20 +10,20 @@ var client = new pg.Client(connectionString);
 client.connect();
 //
 
-var getCrime = function(district, category, granularity, fromDate, toDate, callback) {
+var getCrime = function(district, granularity, fromDate, toDate, callback) {
 	console.log("in getCrime database");
-	if (category === 'All') {
-		//var params = [granularity, district, fromDate, toDate];
-		var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
-							WHERE pd_district = '${district}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
-							GROUP BY ${granularity} ORDER BY ${granularity}`;
-	} else {
-		console.log("user wants a specific category")
-		//var params = [granularity, district, category, fromDate, toDate];
-		var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
-							WHERE pd_district = '${district}' AND category = '${category}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
-							GROUP BY ${granularity} ORDER BY ${granularity}`;
-	}
+	// if (category === 'All') {
+	// 	//var params = [granularity, district, fromDate, toDate];
+	// 	var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
+	// 						WHERE pd_district = '${district}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
+	// 						GROUP BY ${granularity} ORDER BY ${granularity}`;
+	// } else {
+	console.log("user wants a specific category")
+	//var params = [granularity, district, category, fromDate, toDate];
+	var query = `select date_trunc('${granularity}', date) as ${granularity}, count(*) from incident \
+						WHERE pd_district = '${district}' AND date >= to_timestamp('${fromDate}', 'YYYY-MM-DD') AND date < to_timestamp('${toDate}', 'YYYY-MM-DD') \
+						GROUP BY ${granularity} ORDER BY ${granularity}`;
+
 
 	console.log("getCrime Query", query);
 	client.query(query, (err, result) => {

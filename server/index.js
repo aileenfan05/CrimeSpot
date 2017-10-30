@@ -24,16 +24,16 @@ app.get('/crime/:str', function (req, res) {
 	var start = Date.now()
 	statsDClient.increment('.service.crime.query.custom');
 	console.log(q, req.params);
-
+ 
 	//default values mean that str only contain district info? 
 	var district = q.district;
-	var category = q.category;
+	//var category = q.category;
 	var granularity = q.granularity;
 	var fromDate = q.from;
 	var toDate = q.to;
 	console.log('after parse', fromDate, toDate);
 	
-	db.getCrime(district, category, granularity, fromDate, toDate, function (err, result) {
+	db.getCrime(district, granularity, fromDate, toDate, function (err, result) {
 		if (err) {
 			console.log('error getting crime data in server');
 
