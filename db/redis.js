@@ -24,9 +24,9 @@ client.on("error", function (err) {
 // client.get("foo_rand000000000000", function (err, reply) {
 //     console.log(reply.toString()); // Will print `OK`
 // });
-var setCrime = function (key, value, callback) {
+var setCrime = function (key, value, time, callback) {
 	// EXPRIE IN 6 HRS
-	client.set(key, value, 'EX', 21600, function (err, result) {
+	client.set(key, value, 'EX', time, function (err, result) {
 		if (err) {
 			console.log('error in caching result', err);
 			return callback(err);

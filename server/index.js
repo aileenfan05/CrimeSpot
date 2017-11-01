@@ -21,7 +21,8 @@ app.get('/crime/:str', function (req, res) {
 	var string = req.params.str;
 	var q = querystring.parse(string); 
 	var start = Date.now()
-	statsDClient.increment('.service.crime.query.custom');
+	//count all querys
+	statsDClient.increment('.service.crime.query.all');
 
 	console.log(typeof q.zipcode, q.zipcode);
 	var zipcode = q.zipcode;
@@ -49,7 +50,7 @@ app.get('/crime/:str', function (req, res) {
 		district = 'BAYVIEW';
 	} 
 	
-
+// ******************************DEFAULT*********************************************
  
 	//default values mean that str only contain district info? 
 	// var district = q.district || 'MISSION';
@@ -87,7 +88,8 @@ app.get('/crime/:str', function (req, res) {
 				res.end(JSON.stringify(result));
 
 				// Background cache set
-				redis.setCrime(district, JSON.stringify(result), function (err, result) {
+				var expire = 21600 // expire in 6 hrs
+				redis.setCrime(district, JSON.stringify(result), expire, function (err, result) {
 					if (err) {
 						// TODO: Add monitoring for cache.set error
 						statsDClient.increment('.service.crime.query.fail');
@@ -99,25 +101,98 @@ app.get('/crime/:str', function (req, res) {
 				});
 			});
 		});
-	} else {
+	} 
+// ******************************CUSTOM*********************************************
+ 
+	else {
 		var granularity = q.granularity || 'week';
 		var fromDate = q.from;
 		var toDate = q.to;
 
 		console.log('after parse', fromDate, toDate);
 		
-		db.getCrime(district, granularity, fromDate, toDate, function (err, result) {
+		redis.getCrime(string, function(err, result) {
 			if (err) {
-				console.log('error getting crime data in server');
-				const latency = Date.now() - start;
 				statsDClient.increment('.service.crime.query.fail');
 				return res.send(err);
 			}
-			console.log('successfully getting crime data in server');
-			const latency = Date.now() - start;
-			statsDClient.timing('.service.crime.query.custom.latency_ms', latency);
-			return res.send(JSON.stringify(result));
+
+			if (result.length > 0) {
+				//monitor cache hit
+				console.log('cache hit');
+				const latency = Date.now() - start;
+				statsDClient.timing('.service.crime.query.latency_ms', latency);
+	    	statsDClient.increment('.service.crime.query.cache');
+	    		console.log(latency);
+				return res.send(JSON.stringify(result));
+			}
+
+			// TODO: Monitoring cache miss
+			console.log('cache miss');
+
+			db.getCrime(district, granularity, fromDate, toDate, function (err, result) {
+				if (err) {
+					console.log('error getting crime data in server');
+					const latency = Date.now() - start;
+					statsDClient.increment('.service.crime.query.fail');
+					return res.send(err);
+				}
+				console.log('successfully getting crime data in server');
+				const latency = Date.now() - start;
+				statsDClient.timing('.service.crime.query.custom.latency_ms', latency);
+				res.end(JSON.stringify(result));
+
+				var expire = 10 // expire in 10s
+				redis.setCrime(string, JSON.stringify(result), expire, function (err, result) {
+					if (err) {
+						// TODO: Add monitoring for cache.set error
+						statsDClient.increment('.service.crime.query.fail');
+						console.log(err);
+						return;
+					}
+
+					// TODO: add monitoring for cache.set success
+				});
+			});
+			// db.getCache(district, function(err, result) {
+
+			// 	if (err) {
+			// 		// TODO: Monitoring DB error
+			// 		statsDClient.increment('.service.crime.query.fail');
+			// 		return res.send(err);
+			// 	}
+			// 	const latency = Date.now() - start;
+			// 	statsDClient.timing('.service.crime.query.latency_ms', latency);
+			// 	statsDClient.increment('.service.crime.query.db');
+			// 	res.end(JSON.stringify(result));
+
+			// 	// Background cache set
+			// 	var expire = 21600 // expire in 6 hrs
+			// 	redis.setCrime(district, JSON.stringify(result), expire, function (err, result) {
+			// 		if (err) {
+			// 			// TODO: Add monitoring for cache.set error
+			// 			statsDClient.increment('.service.crime.query.fail');
+			// 			console.log(err);
+			// 			return;
+			// 		}
+
+			// 		// TODO: add monitoring for cache.set success
+			// 	});
+			// });
 		});
+
+		// db.getCrime(district, granularity, fromDate, toDate, function (err, result) {
+		// 	if (err) {
+		// 		console.log('error getting crime data in server');
+		// 		const latency = Date.now() - start;
+		// 		statsDClient.increment('.service.crime.query.fail');
+		// 		return res.send(err);
+		// 	}
+		// 	console.log('successfully getting crime data in server');
+		// 	const latency = Date.now() - start;
+		// 	statsDClient.timing('.service.crime.query.custom.latency_ms', latency);
+		// 	return res.send(JSON.stringify(result));
+		// });
 	}
 	
 	//res.send('hi');
