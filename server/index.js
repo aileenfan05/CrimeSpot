@@ -17,9 +17,10 @@ const statsDClient = new statsD({
 app.use(bodyParser.json());
 
 
-app.get('/crime/:str', function (req, res) {
-	var string = req.params.str;
-	var q = querystring.parse(string); 
+app.get('/crime/*', function (req, res) {
+	var q = req.query;
+	// var q = querystring.parse(string); 
+	console.log(q);
 	var start = Date.now()
 	//count all querys
 	statsDClient.increment('.service.crime.query.all');
@@ -97,7 +98,6 @@ app.get('/crime/:str', function (req, res) {
 						return;
 					}
 
-					// TODO: add monitoring for cache.set success
 				});
 			});
 		});
@@ -111,7 +111,7 @@ app.get('/crime/:str', function (req, res) {
 
 		console.log('after parse', fromDate, toDate);
 		
-		redis.getCrime(string, function(err, result) {
+		redis.getCrime(JSON.stringify(q), function(err, result) {
 			if (err) {
 				statsDClient.increment('.service.crime.query.fail');
 				return res.send(err);
@@ -139,11 +139,11 @@ app.get('/crime/:str', function (req, res) {
 				}
 				console.log('successfully getting crime data in server');
 				const latency = Date.now() - start;
-				statsDClient.timing('.service.crime.query.custom.latency_ms', latency);
+				statsDClient.timing('.service.crime.query.latency_ms', latency);
 				res.end(JSON.stringify(result));
 
 				var expire = 10 // expire in 10s
-				redis.setCrime(string, JSON.stringify(result), expire, function (err, result) {
+				redis.setCrime(JSON.stringify(q), JSON.stringify(result), expire, function (err, result) {
 					if (err) {
 						// TODO: Add monitoring for cache.set error
 						statsDClient.increment('.service.crime.query.fail');
