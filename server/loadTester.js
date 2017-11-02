@@ -1,13 +1,13 @@
 
 var request = require ('request');
 setInterval(() => { 
-	request('https://crime-spot.herokuapp.com/crime/zipcode=94131', (err, res, body) => {
+	request('https://crime-spot.herokuapp.com/crime/json?zipcode=94121&granularity=week&from=2017-01-01&to=2017-04-01', (err, res, body) => {
 		if (err) {
 			return console.log('err calling server get', err);
 		}
 		return console.log(body);
 	})
-}, 20);
+}, 200);
 
 // request('https://crime-spot.herokuapp.com/crime/zipcode=94121', (err, res, body) => {
 // 	if (err) {
